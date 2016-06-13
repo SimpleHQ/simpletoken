@@ -1,4 +1,4 @@
-package: github.com/simplehq/simple-token-decoder
+package: github.com/simplehq/simpletoken
 import:
 - package: github.com/dgrijalva/jwt-go
 - package: github.com/go-kit/kit
