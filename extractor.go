@@ -3,7 +3,6 @@ package simpletoken
 import (
 	"fmt"
 	stdhttp "net/http"
-	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -16,7 +15,7 @@ const authorizationHeader = "Authorization"
 const bearer = "bearer"
 
 // Attempts to extract the token on every request
-func tokenExtractor(logger log.Logger) kithttp.RequestFunc {
+func tokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
 	return func(ctx context.Context, r *stdhttp.Request) context.Context {
 		authHeader := r.Header.Get(authorizationHeader)
 		if authHeader == "" {
@@ -29,7 +28,7 @@ func tokenExtractor(logger log.Logger) kithttp.RequestFunc {
 		}
 
 		token, err := jwt.Parse(authHeaderParts[1], func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("AUTH0_CLIENT_SECRET")), nil
+			return secret, nil
 		})
 		if err != nil {
 			logger.Log("err", fmt.Sprintf("Could not decode token. %s:", authHeaderParts[1]))
