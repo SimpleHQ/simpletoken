@@ -14,8 +14,8 @@ import (
 const authorizationHeader = "Authorization"
 const bearer = "bearer"
 
-// Attempts to extract the token on every request
-func tokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
+// Tokenextractor Attempts to extract the token on every request
+func TokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
 	return func(ctx context.Context, r *stdhttp.Request) context.Context {
 		authHeader := r.Header.Get(authorizationHeader)
 		if authHeader == "" {
