@@ -14,16 +14,21 @@ import (
 const authorizationHeader = "Authorization"
 const bearer = "bearer"
 
-// Tokenextractor Attempts to extract the token on every request
+// UserKey ...
+const UserKey = "user"
+
+// TokenExtractor Attempts to extract the token on every request
 func TokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
 	return func(ctx context.Context, r *stdhttp.Request) context.Context {
 		authHeader := r.Header.Get(authorizationHeader)
 		if authHeader == "" {
+			logger.Log("wrn", fmt.Sprintf("'%s' header is missing", authorizationHeader))
 			return ctx
 		}
 
 		authHeaderParts := strings.Split(authHeader, " ")
 		if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != bearer {
+			logger.Log("err", "Authorization header is invalid")
 			return ctx
 		}
 
@@ -31,7 +36,7 @@ func TokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
 			return secret, nil
 		})
 		if err != nil {
-			logger.Log("err", fmt.Sprintf("Could not decode token. %s:", authHeaderParts[1]))
+			logger.Log("err", fmt.Sprintf("Could not decode token: '%s'", authHeaderParts[1]), "jwt error", err)
 			return ctx
 		}
 
@@ -45,7 +50,7 @@ func TokenExtractor(logger log.Logger, secret []byte) kithttp.RequestFunc {
 			return ctx
 		}
 
-		ctx = context.WithValue(ctx, "user", token)
+		ctx = context.WithValue(ctx, UserKey, token)
 		return ctx
 	}
 }
