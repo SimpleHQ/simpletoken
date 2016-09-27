@@ -17,6 +17,9 @@ const bearer = "bearer"
 // UserKey ...
 const UserKey = "user"
 
+// Algorithm used for signing
+var Alg = jwt.SigningMethodHS256.Alg()
+
 // TokenExtractor Attempts to extract the token on every request
 func TokenExtractor(logger log.Logger, secret interface{}) kithttp.RequestFunc {
 	return func(ctx context.Context, r *stdhttp.Request) context.Context {
@@ -40,8 +43,8 @@ func TokenExtractor(logger log.Logger, secret interface{}) kithttp.RequestFunc {
 			return ctx
 		}
 
-		if jwt.SigningMethodRS256.Alg() != token.Header["alg"] {
-			logger.Log("err", fmt.Sprintf("Token signing method mismatch: expected %[1]v, got %[2]v", jwt.SigningMethodRS256.Alg(), token.Header["alg"]))
+		if Alg != token.Header["alg"] {
+			logger.Log("err", fmt.Sprintf("Token signing method mismatch: expected %[1]v, got %[2]v", Alg, token.Header["alg"]))
 			return ctx
 		}
 
